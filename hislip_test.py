@@ -5,24 +5,55 @@ Created on 22 feb. 2017
 
 @author: Levshinovsky Mikhail
 '''
+import time
 
 from pyhislip import HiSLIP
 
 a = HiSLIP()
-a.connect('192.168.0.7')
+a.connect('172.16.10.60')
 
 a.set_max_message_size(256)
 
 a.device_clear()
 
 a.request_lock()
-a.write("MMEM:LOAD 'D:\Tower\PPM.csa'")
 
-a.write("CALC1:PAR:SEL 'Meas_S21_Mag'")
+# Reset
+# a.write(":SYSTem:PRESet")
+# a.write(":AUT")
 
-raw_data = a.ask("CALC1:DATA:SNP:PORT? '1, 2'")
+# Labels
+# a.write(":CHANnel1:LABel 'RS-232'")
+# a.write(":DISPlay:LABel 1")
 
+# delay
+# a.write("TRIGger:DELay:TDELay:TIME 4.00E-9")  # NR3 format
+
+
+# horizontal scale
+
+# trigger
+
+# measurements
+a.write(":MEASure:NWIDth CHANnel1")
+a.write(":MEASure:PWIDth CHANnel1")
+
+
+# show statistics
+a.write(":MEASure:SHOW 1")
+a.write(":MEASure:STATistics:DISPlay 1")
+
+
+while True:
+    try:
+        time.sleep(1)
+        raw_data = a.ask(":MEASure:RESults?").split(',')
+        for i in range(0, len(raw_data), 7):
+            print(raw_data[i:i + 7])
+    except KeyboardInterrupt:
+        break
 
 a.release_lock()
-
-print(raw_data[0:100])
+a.release_lock()
+#
+# print(raw_data[0:100])
